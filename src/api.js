@@ -26,19 +26,26 @@
  * @property {string} content
  */
 
-/** @type {Post[]} */
-const posts = [
-  {
-    id: 'first_post',
-    title: 'first',
-    content: '하위',
-  },
-  {
-    id: 'second_post',
-    title: 'second',
-    content: 'hello2',
-  },
-]
+const fs = require('fs')
+
+/** @returns {Promise<Post[]>} */
+async function getPosts() {
+  const json = await fs.promises.readFile('database.json', 'utf-8')
+  return JSON.parse(json).posts
+}
+
+/** @param {Post[]} posts */
+async function savePosts(posts) {
+  const content = {
+    posts,
+  }
+
+  return fs.promises.writeFile(
+    'database.json',
+    JSON.stringify(content),
+    'utf-8'
+  )
+}
 
 /** @type {Route[]} */
 const routes = [
@@ -48,7 +55,7 @@ const routes = [
     callback: async () => {
       return {
         statusCode: 200,
-        body: posts,
+        body: await getPosts(),
       }
     },
   },
@@ -63,6 +70,8 @@ const routes = [
           body: 'Not found',
         }
       }
+
+      const posts = await getPosts()
 
       const post = posts.find((_post) => _post.id === postId)
 
@@ -98,7 +107,9 @@ const routes = [
         content: body.content,
       }
 
+      const posts = await getPosts()
       posts.push(newPost)
+      savePosts(posts)
 
       return {
         statusCode: 200,
