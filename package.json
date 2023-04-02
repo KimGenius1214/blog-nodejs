@@ -1,7 +1,8 @@
 {
   "scripts": {
     "test": "echo \"Hello world\"",
-    "debug": "node src/main.js"
+    "debug": "node src/main.js",
+    "server": "nodemon src/main.js"
   },
   "devDependencies": {
     "@types/node": "^18.15.3",
